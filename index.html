@@ -474,10 +474,14 @@
         <button class="btn btn-primary" id="btn-analyze-url">Analyser</button>
       </div>
       <div class="status-pill" id="import-loading"><div class="spinner"></div>Analyse en cours...</div>
+      <div class="status-pill" id="import-translating"><div class="spinner"></div>Traduction en cours...</div>
       <div class="success-msg" id="import-result"></div>
       <div class="error-msg" id="import-error"></div>
     </div>
     <div id="import-form" style="display:none">
+      <div style="display:flex;justify-content:flex-end;margin-bottom:12px">
+        <button class="btn btn-secondary" id="btn-translate-import" style="font-size:12px;gap:5px">🌍 Traduire en français</button>
+      </div>
       <div class="form-group">
         <label class="form-label">Photo</label>
         <img id="import-cover-preview" style="width:100%;height:120px;object-fit:cover;border-radius:14px;margin-bottom:10px;display:none" src="" alt="" />
@@ -521,10 +525,14 @@
       </label>
       <div id="pdf-file-name" style="font-size:13px;color:var(--ink-muted);font-style:italic;margin-top:8px"></div>
       <div class="status-pill" id="pdf-loading"><div class="spinner"></div>Analyse en cours...</div>
+      <div class="status-pill" id="pdf-translating"><div class="spinner"></div>Traduction en cours...</div>
       <div class="success-msg" id="pdf-result"></div>
       <div class="error-msg" id="pdf-error"></div>
     </div>
     <div id="pdf-import-form" style="display:none">
+      <div style="display:flex;justify-content:flex-end;margin-bottom:12px">
+        <button class="btn btn-secondary" id="btn-translate-pdf" style="font-size:12px;gap:5px">🌍 Traduire en français</button>
+      </div>
       <div class="form-group">
         <label class="form-label">Photo</label>
         <img id="pdf-cover-preview" style="width:100%;height:120px;object-fit:cover;border-radius:14px;margin-bottom:10px;display:none" src="" alt="" />
@@ -1012,6 +1020,31 @@ function initApp(){
   $('btn-close-item-detail').addEventListener('click',function(){closeModal('modal-item-detail');});
   $('btn-cancel-import').addEventListener('click',function(){closeModal('modal-import');});
   $('btn-cancel-pdf').addEventListener('click',function(){closeModal('modal-pdf-import');});
+
+  // Translation helper
+  async function translateRecipeFields(fields,loadingId,errorId){
+    $(loadingId).classList.add('show');
+    try{
+      var content='Traduis en français les champs suivants d\'une recette. Réponds UNIQUEMENT avec ce JSON sans backticks: {"name":"...","ingredients":"...","steps":"...","notes":"..."}\n\nChamps à traduire:\n'+JSON.stringify(fields);
+      var res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:1200,messages:[{role:'user',content:content}]})});
+      var data=await res.json();
+      var parsed=JSON.parse(data.content.map(function(i){return i.text||'';}).join('').replace(/```json|```/g,'').trim());
+      $(loadingId).classList.remove('show');
+      return parsed;
+    }catch(e){$(loadingId).classList.remove('show');showMsg(errorId,'Erreur de traduction.');return null;}
+  }
+
+  $('btn-translate-import').addEventListener('click',async function(){
+    var fields={name:$('import-name').value,ingredients:$('import-ingr').value,steps:$('import-steps').value,notes:$('import-notes').value};
+    var t=await translateRecipeFields(fields,'import-translating','import-error');
+    if(t){if(t.name)$('import-name').value=t.name;if(t.ingredients)$('import-ingr').value=formatIngredients(t.ingredients);if(t.steps)$('import-steps').value=formatSteps(t.steps);if(t.notes)$('import-notes').value=t.notes;}
+  });
+
+  $('btn-translate-pdf').addEventListener('click',async function(){
+    var fields={name:$('pdf-name').value,ingredients:$('pdf-ingr').value,steps:$('pdf-steps').value,notes:$('pdf-notes').value};
+    var t=await translateRecipeFields(fields,'pdf-translating','pdf-error');
+    if(t){if(t.name)$('pdf-name').value=t.name;if(t.ingredients)$('pdf-ingr').value=formatIngredients(t.ingredients);if(t.steps)$('pdf-steps').value=formatSteps(t.steps);if(t.notes)$('pdf-notes').value=t.notes;}
+  });
   $('btn-close-prod-detail').addEventListener('click',function(){closeModal('modal-prod-detail');});
   $('btn-edit-prod-from-detail').addEventListener('click',function(){closeModal('modal-prod-detail');openEditProd(currentProdId);});
   $('btn-del-prod-from-detail').addEventListener('click',function(){
