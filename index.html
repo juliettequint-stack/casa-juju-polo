@@ -1079,7 +1079,7 @@ function initApp(){
     $('import-loading').classList.add('show');$('import-result').classList.remove('show');$('import-error').classList.remove('show');
     $('import-form').style.display='none';$('import-save-btn').style.display='none';
     try{
-      var res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:1200,messages:[{role:'user',content:'Génère une recette depuis cette URL: '+url+'. JSON sans backticks: {"name":"...","time":"...","portions":"...","type":"Plat","season":"","ingredients":"...","steps":"...","notes":""}'}]})});
+      var res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:1200,messages:[{role:'user',content:'Extrais la recette depuis cette URL: '+url+'. Réponds UNIQUEMENT avec ce JSON sans backticks ni texte autour: {"name":"...","time":"...","portions":"...","type":"Plat","season":"","ingredients":"1 ingrédient par ligne, format: 200g farine\\n3 oeufs\\n...","steps":"1 étape par ligne, sans numérotation: Faire bouillir l\'eau\\nAjouter le sel\\n...","notes":""}'}]})});
       var data=await res.json();
       var parsed=JSON.parse(data.content.map(function(i){return i.text||'';}).join('').replace(/```json|```/g,'').trim());
       $('import-loading').classList.remove('show');
@@ -1088,6 +1088,7 @@ function initApp(){
       $('import-ingr').value=parsed.ingredients||'';$('import-steps').value=parsed.steps||'';$('import-notes').value=parsed.notes||'';
       $('import-type').value=parsed.type||'Plat';$('import-season').value=parsed.season||'';
       $('import-cover-preview').style.display='none';importedCover='';
+      $('import-source').value=url;
       $('import-form').style.display='block';$('import-save-btn').style.display='inline-flex';
     }catch(e){$('import-loading').classList.remove('show');showMsg('import-error',"Impossible d'analyser ce lien.");}
   });
@@ -1114,7 +1115,7 @@ function initApp(){
     try{
       var base64=await readFileAsBase64(file);
       var ctrl=new AbortController();setTimeout(function(){ctrl.abort();},30000);
-      var res=await fetch(API_URL,{method:'POST',signal:ctrl.signal,headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:1000,messages:[{role:'user',content:[{type:'document',source:{type:'base64',media_type:'application/pdf',data:base64}},{type:'text',text:'Extrais la première recette. JSON sans backticks: {"name":"...","time":"...","portions":"...","type":"Plat","season":"","ingredients":"...","steps":"...","notes":""}'}]}]})});
+      var res=await fetch(API_URL,{method:'POST',signal:ctrl.signal,headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:1000,messages:[{role:'user',content:[{type:'document',source:{type:'base64',media_type:'application/pdf',data:base64}},{type:'text',text:'Extrais la première recette. Réponds UNIQUEMENT avec ce JSON sans backticks ni texte autour: {"name":"...","time":"...","portions":"...","type":"Plat","season":"","ingredients":"1 ingrédient par ligne, format: 200g farine\\n3 oeufs\\n...","steps":"1 étape par ligne, sans numérotation: Faire bouillir l\'eau\\nAjouter le sel\\n...","notes":""}'}]}]})});
       if(!res.ok)throw new Error('HTTP '+res.status);
       var data=await res.json();
       var parsed=JSON.parse(data.content.map(function(i){return i.text||'';}).join('').replace(/```json|```/g,'').trim());
