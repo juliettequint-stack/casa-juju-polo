@@ -871,6 +871,35 @@ function showMsg(id,msg){var el=$(id);el.textContent=msg;el.classList.add('show'
 function readFileAsBase64(file){return new Promise(function(res,rej){var r=new FileReader();r.onload=function(){res(r.result.split(',')[1]);};r.onerror=rej;r.readAsDataURL(file);});}
 function readFileAsDataURL(file){return new Promise(function(res,rej){var r=new FileReader();r.onload=function(){res(r.result);};r.onerror=rej;r.readAsDataURL(file);});}
 
+// Reformat imported ingredients: handle comma-separated or already line-by-line
+function formatIngredients(raw){
+  if(!raw)return'';
+  // If it looks like a comma-separated list (few newlines, many commas), split on commas
+  var lines=raw.split('\n').map(function(l){return l.trim();}).filter(Boolean);
+  if(lines.length<=3&&raw.indexOf(',')>-1){
+    // Split on commas, but be careful not to split quantities like "1,5"
+    lines=raw.split(/,\s*(?=[A-ZÀ-Ža-zà-ž0-9])/).map(function(l){return l.trim();}).filter(Boolean);
+  }
+  return lines.join('\n');
+}
+
+// Reformat imported steps: remove numbering (1. 2. etc) and split if needed
+function formatSteps(raw){
+  if(!raw)return'';
+  // Split on newlines first
+  var lines=raw.split('\n').map(function(l){return l.trim();}).filter(Boolean);
+  // If only 1-2 lines with numbers, split on "1. " "2. " etc
+  if(lines.length<=2){
+    var split=raw.split(/\d+[\.\)]\s+/).map(function(l){return l.trim();}).filter(Boolean);
+    if(split.length>2)lines=split;
+  }
+  // Remove leading numbers like "1. " "1) " "Étape 1: "
+  lines=lines.map(function(l){
+    return l.replace(/^(\d+[\.\)]\s*|étape\s*\d+\s*[:.-]\s*)/i,'').trim();
+  }).filter(Boolean);
+  return lines.join('\n');
+}
+
 function cleanIngredientName(raw){
   var s=raw
     .replace(/^[\d.,]+\s*\/\s*[\d.,]+\s*/,'')
@@ -1085,7 +1114,7 @@ function initApp(){
       $('import-loading').classList.remove('show');
       $('import-result').innerHTML='Recette : <strong>'+parsed.name+'</strong>';$('import-result').classList.add('show');
       $('import-name').value=parsed.name||'';$('import-time').value=parsed.time||'';$('import-portions').value=parsed.portions||'';
-      $('import-ingr').value=parsed.ingredients||'';$('import-steps').value=parsed.steps||'';$('import-notes').value=parsed.notes||'';
+      $('import-ingr').value=formatIngredients(parsed.ingredients||'');$('import-steps').value=formatSteps(parsed.steps||'');$('import-notes').value=parsed.notes||'';
       $('import-type').value=parsed.type||'Plat';$('import-season').value=parsed.season||'';
       $('import-cover-preview').style.display='none';importedCover='';
       $('import-source').value=url;
@@ -1122,7 +1151,7 @@ function initApp(){
       $('pdf-loading').classList.remove('show');
       $('pdf-result').innerHTML='Recette : <strong>'+parsed.name+'</strong>';$('pdf-result').classList.add('show');
       $('pdf-name').value=parsed.name||'';$('pdf-time').value=parsed.time||'';$('pdf-portions').value=parsed.portions||'';
-      $('pdf-ingr').value=parsed.ingredients||'';$('pdf-steps').value=parsed.steps||'';$('pdf-notes').value=parsed.notes||'';
+      $('pdf-ingr').value=formatIngredients(parsed.ingredients||'');$('pdf-steps').value=formatSteps(parsed.steps||'');$('pdf-notes').value=parsed.notes||'';
       $('pdf-type').value=parsed.type||'Plat';$('pdf-season').value=parsed.season||'';
       $('pdf-cover-preview').style.display='none';pdfImportedCover='';
       $('pdf-import-form').style.display='block';$('pdf-save-btn').style.display='inline-flex';
