@@ -291,9 +291,12 @@
           <h1 style="font-family:var(--serif);font-size:34px;letter-spacing:-.5px;margin-bottom:6px">Planning de la semaine</h1>
           <p style="font-size:14px;color:var(--ink-muted)">Clique sur + pour ajouter un repas.</p>
         </div>
-        <button class="btn btn-terra" id="btn-gen-shopping">Aux courses !
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-        </button>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-ghost" id="btn-clear-planner">Vider le planning</button>
+          <button class="btn btn-terra" id="btn-gen-shopping">Aux courses !
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </button>
+        </div>
       </div>
       <div class="week-overview"><div class="week-cols" id="week-cols"></div></div>
       <div style="margin-top:32px;border-top:var(--border-soft);padding-top:28px">
@@ -912,11 +915,12 @@ function cleanIngredientName(raw){
   var s=raw
     .replace(/^[\d.,]+\s*\/\s*[\d.,]+\s*/,'')
     .replace(/^[\d.,]+\s*/,'')
-    .replace(/^(g|kg|cl|l|ml|cs|cc|tsp|tbsp|unités?|bottes?|tranches?|morceaux?|gousses?|pincées?|sachets?|boîtes?|verres?|tasses?|poignées?)\s+/i,'')
+    // Strip units including "cuillère à soupe/café", "pincée de", etc.
+    .replace(/^(cuillères?\s+à\s+soupe|cuillères?\s+à\s+café|cuillère\s+à\s+s\.|cuillère\s+à\s+c\.|c\.?\s*à\s*s\.?|c\.?\s*à\s*c\.?|g|kg|cl|l|ml|cs|cc|tsp|tbsp|unités?|bottes?|tranches?|morceaux?|gousses?|pincées?\s+de\s+|pincées?|sachets?|boîtes?|verres?|tasses?|poignées?|filets?)\s+/i,'')
     .replace(/^(quelques?\s+brins?\s+de\s+|quelques?\s+feuilles?\s+de\s+|quelques?\s+feuilles?\s+|quelques?\s+brins?\s+|quelques?\s+|un\s+peu\s+de\s+|une?\s+poignée\s+de\s+|un\s+filet\s+de\s+)/i,'')
     .replace(/^(de |d'|du |des |le |la |les )/i,'')
-    // Strip trailing descriptors: adjectives, preparations, states
-    .replace(/[\s,]+(égouttés?|effilées?|frais|fraîche?s?|secs?|séchés?|séché|en boîte|surgelés?|râpés?|râpée?s?|moulus?|moulue?s?|entiers?|entière?s?|ou\s+.+|émincés?|éminc[eé]e?s?|hachés?|hachée?s?|coupés?|coupée?s?|émietté[es]?|écrasés?|écrasée?s?|pelés?|pelée?s?|mixés?|mixée?s?|grillés?|grillée?s?|cuits?|cuites?|crus?|crues?|rôtis?|rôtie?s?|mariné[es]?|congelés?|surgelé[es]?|en dés?|en lamelles?|en rondelles?|en julienne|en brunoise|en purée|en poudre|en flocons?|en conserve|bio|frais|nature|salé[es]?|fumés?|fumée?s?|allumettes?|lardons?|effilochés?|effilochée?s?|haché\s+fin|très\s+fin|finement\s+.+)$/i,'')
+    // Strip trailing descriptors - comprehensive list
+    .replace(/[\s,]+(égouttés?|effilées?|frais|fraîche?s?|secs?|séchés?|séché|en boîte|surgelés?|râpés?|râpée?s?|moulus?|moulue?s?|entiers?|entière?s?|ou\s+.+|émincés?|éminc[eé]e?s?|hachés?|hachée?s?|coupés?(\s+en\s+.+)?|coupée?s?(\s+en\s+.+)?|émietté[es]?|écrasés?|écrasée?s?|pelés?|pelée?s?|mixés?|mixée?s?|grillés?|grillée?s?|cuits?|cuites?|crus?|crues?|rôtis?|rôtie?s?|mariné[es]?|congelés?|surgelé[es]?|en\s+dés?|en\s+lamelles?|en\s+rondelles?(\s+.+)?|en\s+fines?\s+rondelles?|en\s+julienne|en\s+brunoise|en\s+purée|en\s+poudre|en\s+flocons?|en\s+conserve|bio|nature|salé[es]?|fumés?|fumée?s?|allumettes?|effilochés?|effilochée?s?|finement\s+.+|grossièrement\s+.+|très\s+fin.*)$/i,'')
     .trim();
   if(!s||s.length<2)return raw.trim();
   return s.charAt(0).toUpperCase()+s.slice(1);
@@ -1083,6 +1087,10 @@ function initApp(){
 
   // Planner
   $('btn-gen-shopping').addEventListener('click',function(){generateShopping(true);});
+  $('btn-clear-planner').addEventListener('click',function(){
+    if(!confirm('Vider tout le planning de la semaine ?'))return;
+    plannerData={};renderPlanner();savePlanner();
+  });
   $('btn-planner-pick-cancel').addEventListener('click',function(){pendingPickRecipe=null;$('planner-pick-banner').style.display='none';});
   $('btn-picker-cancel').addEventListener('click',cancelPickMode);
   $('btn-picker-free').addEventListener('click',function(){if(!pickerTarget)return;$('free-meal-input').value='';openModal('modal-free-meal');});
@@ -1428,7 +1436,7 @@ function generateShopping(navigate){
       var portMult=entry.portions?(entry.portions/(parseInt(entry.recipe.portions)||2)):1;
       entry.recipe.ingr.split('\n').forEach(function(l){
         var line=l.trim();if(!line||/^==.+==$/.test(line))return;
-        var m=line.match(/^([\d.,\/]+\s*(?:g|kg|cl|l|ml|cs|cc|tsp|tbsp|unités?|bottes?|tranches?|morceaux?|gousses?|pincées?|sachets?|boîtes?|verres?|tasses?)?\s*)/i);
+        var m=line.match(/^([\d.,\/]+\s*(?:cuillères?\s+à\s+soupe|cuillères?\s+à\s+café|c\.?\s*à\s*s\.?|c\.?\s*à\s*c\.?|g|kg|cl|l|ml|cs|cc|tsp|tbsp|unités?|bottes?|tranches?|morceaux?|gousses?|pincées?|sachets?|boîtes?|verres?|tasses?)?\s*)/i);
         var qty=m?m[1].trim():'';
         var nameRaw=cleanIngredientName(line.slice(qty.length).trim()||line);
         // Apply portions multiplier
