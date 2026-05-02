@@ -516,6 +516,8 @@
       <button class="btn-cancel" id="btn-cancel-import">Annuler</button>
       <button class="btn btn-primary" id="import-save-btn" style="display:none">Ajouter la recette</button>
     </div>
+  </div>
+</div>
 
 <div class="modal-bg" id="modal-pdf-import">
   <div class="modal">
@@ -1005,7 +1007,6 @@ function _tryBoot(){if(_fbBootDone)return;_fbBootDone=true;document.getElementBy
 setTimeout(_tryBoot,8000);
 
 function initApp(){
-  console.log('initApp START');
   if(window._recipes&&window._recipes.length){recipes=window._recipes;nextId=Math.max.apply(null,recipes.map(function(r){return r.id||0;}))+1;}
   if(window._plannerData)plannerData=window._plannerData;
   if(window._prodNotes)prodNotes=Object.assign({},prodNotes,window._prodNotes);
@@ -1015,9 +1016,7 @@ function initApp(){
       if(idx>=0){PRODUCTS[idx]=fbp;}else{PRODUCTS.push(fbp);}
     });
   }
-  console.log('initApp after products merge');
   recipes.forEach(function(r){if(r.ingr)syncIngredientsToProducts(r.ingr);});
-  console.log('initApp after sync');
   document.querySelectorAll('.nav-btn').forEach(function(btn){
     btn.addEventListener('click',function(){
       document.querySelectorAll('.view').forEach(function(v){v.classList.remove('active');});
@@ -1093,7 +1092,6 @@ function initApp(){
     closeModal('modal-prod-detail');renderProducts();saveProducts();
   });
   $('btn-cancel-prod-edit').addEventListener('click',function(){closeModal('modal-prod-edit');});
-  console.log('initApp after prod modal listeners');
   // Portions modal
   $('modal-port-minus').addEventListener('click',function(){if(portionsCurrent>1){portionsCurrent--;$('modal-port-val').textContent=portionsCurrent;}});
   $('modal-port-plus').addEventListener('click',function(){portionsCurrent++;$('modal-port-val').textContent=portionsCurrent;});
@@ -1243,7 +1241,6 @@ function initApp(){
   });
 
   // Products
-  console.log('initApp before btn-add-prod');
   $('btn-add-prod').addEventListener('click',function(){
     editingProdId=null;pendingProdImg='';
     $('prod-modal-title').textContent='Nouveau produit';$('prod-form-name').value='';
@@ -1279,7 +1276,6 @@ function initApp(){
   });
 
   applyFilters();renderPlanner();renderShopping();
-  console.log('initApp END');
 }
 
 // Recipes
