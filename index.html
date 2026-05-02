@@ -616,16 +616,18 @@ var SHOP_CATS=['Légumes','Fruits','Féculents','Produits laitiers','Protéines'
 var CAT_EMOJIS={'Légumes':'🥦','Fruits':'🍎','Féculents':'🍝','Produits laitiers':'🧀','Protéines':'🥩','Surgelés':'🧊','Condiments':'🫙','Épices & aromates':'🌿','Épicerie sucrée':'🍬','Épicerie salée':'🧂','Fruits secs & noix':'🥜','Boissons':'🥤','Produits maison':'🧴'};
 var PROD_CATS=['Tous','Légumes','Fruits','Féculents','Produits laitiers','Protéines','Surgelés','Condiments','Épices & aromates','Épicerie sucrée','Épicerie salée','Fruits secs & noix','Boissons','Produits maison'];
 var INGR_CATS={
-  'Légumes':['tomate','courgette','carotte','aubergine','poivron','poireau','oignon','ail','salade','épinard','champignon','haricot','betterave','brocoli','chou','fenouil','concombre','radis','céleri'],
-  'Fruits':['pomme','citron','orange','banane','fraise','mangue','poire','raisin','abricot','pêche','framboise','myrtille','ananas','kiwi','melon','avocat'],
-  'Féculents':['spaghetti','pasta','pâtes','riz','pomme de terre','lentille','quinoa','farine','pain','semoule','boulgour','polenta','pois chiche'],
-  'Produits laitiers':['beurre','fromage','parmesan','crème','lait','yaourt','mozzarella','gruyère','féta','ricotta','mascarpone','camembert'],
-  'Protéines':['poulet','saumon','thon','lardons','poisson','boeuf','pavé','crevette','cabillaud','oeuf','oeufs','tofu','viande','jambon','merguez','agneau','porc'],
+  'Légumes':['tomate','courgette','carotte','aubergine','poivron','poireau','oignon','ail','salade','épinard','champignon','haricot vert','betterave','brocoli','chou','fenouil','concombre','radis','céleri','artichaut','asperge','panais','endive','blette','courgette','potiron','courge','butternut','patate douce'],
+  'Fruits':['pomme','citron','orange','banane','fraise','mangue','poire','raisin','abricot','pêche','framboise','myrtille','ananas','kiwi','melon','avocat','pastèque','cerise','figue','coing','prune','grenade','fruit'],
+  'Féculents':['spaghetti','pasta','pâtes','riz','quinoa','pain','semoule','boulgour','polenta','maïzena','maïs','orge','épeautre','vermicelle','tagliatelle','penne','fusilli','lasagne','gnocchi','wrap','tortilla'],
+  'Produits laitiers':['beurre','fromage','parmesan','crème','lait','yaourt','mozzarella','gruyère','feta','féta','ricotta','mascarpone','camembert','cheddar','gouda','kéfir','gorgonzola','comté'],
+  'Protéines':['poulet','saumon','thon','lardons','poisson','boeuf','pavé','crevette','cabillaud','oeuf','oeufs','œuf','œufs','tofu','tempeh','seitan','jackfruit','viande','jambon','merguez','agneau','porc','dinde','truite','sardine','anchois','poulpe','moule'],
+  'Épicerie sucrée':['farine','levure','sucre','cassonade','miel','chocolat','confiture','cacao','vanille','sirop d\'érable','sirop','caramel','pâte feuilletée','pâte brisée','pâte sablée'],
+  'Épicerie salée':['pois chiche','lentille','haricot rouge','haricot blanc','flageolet','fève','concentré de tomates','tomate concassée','tomates pelées','bouillon','levure chimique','levure de boulanger','bicarbonate','chapelure','maïzena','fécule'],
   'Surgelés':['surgelé','congelé'],
-  'Condiments':['sauce soja','miel','moutarde','ketchup','mayonnaise','vinaigre','huile','bouillon','concentré','tahini','sésame'],
-  'Épices & aromates':['thym','herbes','sel','poivre','cannelle','cumin','curry','paprika','curcuma','gingembre','basilic','origan','persil','coriandre','laurier','muscade','menthe'],
-  'Fruits secs & noix':['noix','amande','noisette','pistache','cajou','raisin sec','datte','figue','pruneau'],
-  'Boissons':['jus','eau','café','thé','vin','bière','sirop','soda'],
+  'Condiments':['sauce soja','miel','moutarde','ketchup','mayonnaise','vinaigre','huile','bouillon','tahini','sésame','pesto','olives','câpres','cornichon'],
+  'Épices & aromates':['thym','herbes','sel','poivre','cannelle','cumin','curry','paprika','curcuma','gingembre','basilic','origan','persil','coriandre','laurier','muscade','menthe','estragon','romarin','safran','cardamome','anis','clou de girofle','ras el','garam','piment'],
+  'Fruits secs & noix':['noix','amande','noisette','pistache','cajou','raisin sec','datte','figue sèche','pruneau','cacahuète','pignon'],
+  'Boissons':['jus','eau','café','thé','vin','bière','sirop','soda','lait végétal','lait d\'amande','lait de soja','lait de coco'],
   'Produits maison':['lessive','savon','éponge','nettoyant','vaisselle','papier']
 };
 var API_URL='/.netlify/functions/claude';
@@ -914,13 +916,17 @@ function formatSteps(raw){
 function cleanIngredientName(raw){
   var s=raw
     .replace(/^[\d.,]+\s*\/\s*[\d.,]+\s*/,'')
-    .replace(/^[\d.,]+\s*/,'')
-    // Strip units including "cuillère à soupe/café", "pincée de", etc.
-    .replace(/^(cuillères?\s+à\s+soupe|cuillères?\s+à\s+café|cuillère\s+à\s+s\.|cuillère\s+à\s+c\.|c\.?\s*à\s*s\.?|c\.?\s*à\s*c\.?|g|kg|cl|l|ml|cs|cc|tsp|tbsp|unités?|bottes?|tranches?|morceaux?|gousses?|pincées?\s+de\s+|pincées?|sachets?|boîtes?|verres?|tasses?|poignées?|filets?)\s+/i,'')
+    .replace(/^[\d.,½¼¾⅓⅔]+\s*/,'')
+    // Strip units including "cuillère à soupe/café"
+    .replace(/^(cuillères?\s+à\s+soupe|cuillères?\s+à\s+café|cuillère\s+à\s+s\.|cuillère\s+à\s+c\.|c\.?\s*à\s*s\.?|c\.?\s*à\s*c\.?|g|kg|cl|l|ml|cs|cc|tsp|tbsp|unités?|bottes?|tranches?|morceaux?|gousses?|pincées?\s+de\s+|pincées?|sachets?|boîtes?|verres?|tasses?|poignées?|filets?|cuil\.?\s+à\s+s\.?|cuil\.?\s+à\s+c\.?)\s+/i,'')
     .replace(/^(quelques?\s+brins?\s+de\s+|quelques?\s+feuilles?\s+de\s+|quelques?\s+feuilles?\s+|quelques?\s+brins?\s+|quelques?\s+|un\s+peu\s+de\s+|une?\s+poignée\s+de\s+|un\s+filet\s+de\s+)/i,'')
     .replace(/^(de |d'|du |des |le |la |les )/i,'')
-    // Strip trailing descriptors - comprehensive list
-    .replace(/[\s,]+(égouttés?|effilées?|frais|fraîche?s?|secs?|séchés?|séché|en boîte|surgelés?|râpés?|râpée?s?|moulus?|moulue?s?|entiers?|entière?s?|ou\s+.+|émincés?|éminc[eé]e?s?|hachés?|hachée?s?|coupés?(\s+en\s+.+)?|coupée?s?(\s+en\s+.+)?|émietté[es]?|écrasés?|écrasée?s?|pelés?|pelée?s?|mixés?|mixée?s?|grillés?|grillée?s?|cuits?|cuites?|crus?|crues?|rôtis?|rôtie?s?|mariné[es]?|congelés?|surgelé[es]?|en\s+dés?|en\s+lamelles?|en\s+rondelles?(\s+.+)?|en\s+fines?\s+rondelles?|en\s+julienne|en\s+brunoise|en\s+purée|en\s+poudre|en\s+flocons?|en\s+conserve|bio|nature|salé[es]?|fumés?|fumée?s?|allumettes?|effilochés?|effilochée?s?|finement\s+.+|grossièrement\s+.+|très\s+fin.*)$/i,'')
+    // Strip size/quantity adjectives at start: gros, petit, frais, etc.
+    .replace(/^(gros|grosse?s?|petit|petite?s?|grand|grande?s?|moyen|moyenne?s?|frais|fraîche?s?|vieux|vieille?s?)\s+/i,'')
+    // Strip everything after a comma
+    .replace(/,.*$/,'')
+    // Strip trailing descriptors
+    .replace(/\s+(égouttés?|rincés?|rincée?s?|effilées?|frais|fraîche?s?|secs?|séchés?|en boîte|surgelés?|râpés?|râpée?s?|moulus?|moulue?s?|entiers?|entière?s?|ou\s+.+|émincés?|éminc[eé]e?s?|hachés?|hachée?s?|coupés?(\s+en\s+\S+)?(\s+\S+)*|coupée?s?(\s+en\s+\S+)?(\s+\S+)*|émietté[es]?|écrasés?|écrasée?s?|pelés?|pelée?s?|mixés?|mixée?s?|grillés?|grillée?s?|cuits?|cuites?|crus?|crues?|rôtis?|rôtie?s?|mariné[es]?|congelés?|surgelé[es]?|en\s+dés?|en\s+lamelles?|en\s+rondelles?(\s+\S+)*|en\s+fines?\s+rondelles?|en\s+julienne|en\s+brunoise|en\s+purée|en\s+poudre|en\s+flocons?|en\s+conserve|bio|nature|salé[es]?|fumés?|fumée?s?|allumettes?|effilochés?|effilochée?s?|finement\s+\S+|grossièrement\s+\S+|fraîchement\s+\S+)$/i,'')
     .trim();
   if(!s||s.length<2)return raw.trim();
   return s.charAt(0).toUpperCase()+s.slice(1);
@@ -930,7 +936,7 @@ function guessCategory(name){
   var n=name.toLowerCase();
   var cats=Object.keys(INGR_CATS);
   for(var i=0;i<cats.length;i++){var kws=INGR_CATS[cats[i]];for(var j=0;j<kws.length;j++){if(n.indexOf(kws[j])!==-1)return cats[i];}}
-  return 'Légumes';
+  return 'Épicerie salée';
 }
 
 function syncIngredientsToProducts(ingr){
@@ -1238,7 +1244,7 @@ function initApp(){
     }
     if(editingProdId){var idx=PRODUCTS.findIndex(function(x){return x.id===editingProdId;});if(idx>=0){PRODUCTS[idx].name=name;PRODUCTS[idx].cat=cat;PRODUCTS[idx].emoji=CAT_EMOJIS[cat]||'🛒';PRODUCTS[idx].img=pendingProdImg;}}
     else PRODUCTS.push({id:'custom_'+Date.now(),name:name,cat:cat,emoji:CAT_EMOJIS[cat]||'🛒',img:pendingProdImg||''});
-    closeModal('modal-prod-edit');renderProducts();saveProducts();initProducts();
+    closeModal('modal-prod-edit');renderProducts();saveProducts();try{initProducts();}catch(e){console.warn('initProducts error:',e);}
   });
 
   applyFilters();renderPlanner();renderShopping();
