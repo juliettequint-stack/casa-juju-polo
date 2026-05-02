@@ -1003,21 +1003,19 @@ function _tryBoot(){if(_fbBootDone)return;_fbBootDone=true;document.getElementBy
 setTimeout(_tryBoot,8000);
 
 function initApp(){
+  console.log('initApp START');
   if(window._recipes&&window._recipes.length){recipes=window._recipes;nextId=Math.max.apply(null,recipes.map(function(r){return r.id||0;}))+1;}
   if(window._plannerData)plannerData=window._plannerData;
   if(window._prodNotes)prodNotes=Object.assign({},prodNotes,window._prodNotes);
   if(window._customProducts&&window._customProducts.length){
-    // Merge: update default products with Firebase data (preserves images & edits),
-    // and keep any extra custom products not in defaults
     window._customProducts.forEach(function(fbp){
       var idx=PRODUCTS.findIndex(function(p){return p.id===fbp.id;});
       if(idx>=0){PRODUCTS[idx]=fbp;}else{PRODUCTS.push(fbp);}
     });
   }
-
-  // Sync ingredients but DON'T create duplicates of existing products
+  console.log('initApp after products merge');
   recipes.forEach(function(r){if(r.ingr)syncIngredientsToProducts(r.ingr);});
-  // Navigation
+  console.log('initApp after sync');
   document.querySelectorAll('.nav-btn').forEach(function(btn){
     btn.addEventListener('click',function(){
       document.querySelectorAll('.view').forEach(function(v){v.classList.remove('active');});
@@ -1093,7 +1091,7 @@ function initApp(){
     closeModal('modal-prod-detail');renderProducts();saveProducts();
   });
   $('btn-cancel-prod-edit').addEventListener('click',function(){closeModal('modal-prod-edit');});
-
+  console.log('initApp after prod modal listeners');
   // Portions modal
   $('modal-port-minus').addEventListener('click',function(){if(portionsCurrent>1){portionsCurrent--;$('modal-port-val').textContent=portionsCurrent;}});
   $('modal-port-plus').addEventListener('click',function(){portionsCurrent++;$('modal-port-val').textContent=portionsCurrent;});
@@ -1243,6 +1241,7 @@ function initApp(){
   });
 
   // Products
+  console.log('initApp before btn-add-prod');
   $('btn-add-prod').addEventListener('click',function(){
     editingProdId=null;pendingProdImg='';
     $('prod-modal-title').textContent='Nouveau produit';$('prod-form-name').value='';
@@ -1278,6 +1277,7 @@ function initApp(){
   });
 
   applyFilters();renderPlanner();renderShopping();
+  console.log('initApp END');
 }
 
 // Recipes
@@ -1403,7 +1403,13 @@ function renderPlanner(){
           div.innerHTML=img+ph+'<span class="meal-entry-name">'+r2.name+portLabel+'</span>';
         }else{div.innerHTML='<div class="meal-entry-ph">🍽️</div><span class="meal-entry-name">'+(entry.label||'Repas libre')+'</span>';}
         var rm=document.createElement('button');rm.className='meal-entry-remove';rm.textContent='×';
-        (function(d,m,i){rm.addEventListener('click',function(){getPlannerMeal(d,m).splice(i,1);renderPlanner();savePlanner();});})(day,mi,ei);
+        (function(d,m,i,entry){
+          rm.addEventListener('click',function(e){e.stopPropagation();getPlannerMeal(d,m).splice(i,1);renderPlanner();savePlanner();});
+          if(entry.type==='recipe'&&entry.recipe){
+            div.style.cursor='pointer';
+            div.addEventListener('click',function(e){if(e.target===rm)return;openDetail(entry.recipe.id);});
+          }
+        })(day,mi,ei,entry);
         div.appendChild(rm);eDiv.appendChild(div);
       });
       block.appendChild(eDiv);
