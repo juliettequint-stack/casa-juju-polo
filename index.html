@@ -64,22 +64,22 @@
     .card-meta{font-size:12px;color:var(--ink-muted);margin-bottom:8px}
     .planner-header-row{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px}
     .week-overview{overflow-x:auto;padding-bottom:8px}
-    .week-cols{display:grid;grid-template-columns:repeat(7,minmax(148px,1fr));gap:10px;min-width:840px}
+    .week-cols{display:grid;grid-template-columns:repeat(7,minmax(180px,1fr));gap:12px;min-width:900px}
     .day-col-new{background:white;border:var(--border-soft);border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--sh-sm)}
-    .day-col-header{padding:10px 12px;background:var(--green-pale);border-bottom:var(--border-soft);text-align:center}
-    .day-col-name{font-size:11px;font-weight:500;color:var(--green);text-transform:uppercase;letter-spacing:1px}
-    .day-col-body{padding:8px;display:flex;flex-direction:column;gap:8px}
+    .day-col-header{padding:12px 14px;background:var(--green);border-bottom:none;text-align:center}
+    .day-col-name{font-size:12px;font-weight:700;color:white;text-transform:uppercase;letter-spacing:1.2px}
+    .day-col-body{padding:10px;display:flex;flex-direction:column;gap:10px}
     .meal-block-new{border:var(--border-soft);border-radius:var(--r-md);overflow:hidden;background:var(--cream)}
-    .meal-block-label{font-size:10px;font-weight:500;color:var(--ink-muted);text-transform:uppercase;letter-spacing:.7px;padding:6px 9px 4px;display:block}
-    .meal-entries{display:flex;flex-direction:column;padding:0 6px 4px;gap:4px}
-    .meal-entry{display:flex;align-items:center;gap:6px;background:white;border-radius:6px;padding:5px 7px;border:var(--border-soft)}
-    .meal-entry-ph{width:26px;height:26px;border-radius:5px;background:var(--green-pale);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
-    .meal-entry-img{width:26px;height:26px;border-radius:5px;object-fit:cover;flex-shrink:0}
-    .meal-entry-name{font-size:11px;font-weight:500;color:var(--ink);flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .meal-entry-remove{background:none;border:none;cursor:pointer;color:var(--ink-muted);font-size:13px;padding:0 2px;flex-shrink:0;line-height:1}
+    .meal-block-label{font-size:10px;font-weight:600;color:var(--ink-muted);text-transform:uppercase;letter-spacing:.8px;padding:7px 10px 5px;display:block}
+    .meal-entries{display:flex;flex-direction:column;padding:0 7px 5px;gap:5px}
+    .meal-entry{display:flex;align-items:center;gap:8px;background:white;border-radius:8px;padding:7px 8px;border:var(--border-soft)}
+    .meal-entry-ph{width:36px;height:36px;border-radius:7px;background:var(--green-pale);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+    .meal-entry-img{width:36px;height:36px;border-radius:7px;object-fit:cover;flex-shrink:0}
+    .meal-entry-name{font-size:12px;font-weight:500;color:var(--ink);flex:1;min-width:0;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-height:1.35}
+    .meal-entry-remove{background:none;border:none;cursor:pointer;color:var(--ink-muted);font-size:14px;padding:0 2px;flex-shrink:0;line-height:1}
     .meal-entry-remove:hover{color:var(--terra)}
-    .meal-add-wrap{display:flex;justify-content:center;padding:4px 6px 7px}
-    .btn-add-meal{width:30px;height:30px;border-radius:50%;border:none;background:#E8C547;color:var(--ink);font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1}
+    .meal-add-wrap{display:flex;justify-content:center;padding:5px 7px 8px}
+    .btn-add-meal{width:32px;height:32px;border-radius:50%;border:none;background:#E8C547;color:var(--ink);font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1}
     .btn-add-meal:hover{background:#d4b43a}
     .pick-banner{display:none;position:sticky;top:64px;z-index:90;background:var(--green);color:white;padding:10px 22px;align-items:center;gap:12px;font-size:13px;font-weight:500;border-radius:0 0 var(--r-md) var(--r-md);margin:0 -32px 16px;flex-wrap:wrap}
     .pick-banner-label{flex:1}
@@ -608,7 +608,7 @@
 </div>
 
 <script>
-var DAYS=['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
+var DAYS=['Sam','Dim','Lun','Mar','Mer','Jeu','Ven'];
 var MEALS=['Déjeuner','Dîner'];
 var EMOJIS=['🍝','🥗','🍲','🥘','🍛','🥙','🫕','🍜','🥩','🐟','🥕','🧆','🥧','🧅'];
 var SEASON_ICONS={Printemps:'🌸','Été':'☀️',Automne:'🍂',Hiver:'❄️'};
@@ -915,29 +915,38 @@ function formatSteps(raw){
 
 function cleanIngredientName(raw){
   var s=raw
-    .replace(/^[\d.,]+\s*\/\s*[\d.,]+\s*/,'')
-    .replace(/^[\d.,½¼¾⅓⅔]+\s*/,'')
-    // Strip units including "cuillère à soupe/café"
-    .replace(/^(cuillères?\s+à\s+soupe|cuillères?\s+à\s+café|cuillère\s+à\s+s\.|cuillère\s+à\s+c\.|c\.?\s*à\s*s\.?|c\.?\s*à\s*c\.?|g|kg|cl|l|ml|cs|cc|tsp|tbsp|unités?|bottes?|tranches?|morceaux?|gousses?|pincées?\s+de\s+|pincées?|sachets?|boîtes?|verres?|tasses?|poignées?|filets?|cuil\.?\s+à\s+s\.?|cuil\.?\s+à\s+c\.?)\s+/i,'')
+    .replace(/^[\d.,½¼¾⅓⅔\/]+\s*/,'')
+    // Strip units at start — including abbreviations like "cuil." and fractions
+    .replace(/^(cuillères?\s+à\s+soupe\s+de\s+|cuillères?\s+à\s+soupe\s+|cuillères?\s+à\s+café\s+de\s+|cuillères?\s+à\s+café\s+|cuil\.\s+à\s+soupe\s+de\s+|cuil\.\s+à\s+soupe\s+|cuil\.\s+à\s+café\s+de\s+|cuil\.\s+à\s+café\s+|c\.?\s*à\s*s\.?\s+de\s+|c\.?\s*à\s*s\.?\s+|c\.?\s*à\s*c\.?\s+de\s+|c\.?\s*à\s*c\.?\s+|g\s+de\s+|kg\s+de\s+|cl\s+de\s+|ml\s+de\s+|g\s+|kg\s+|cl\s+|l\s+|ml\s+|cs\s+|cc\s+|tsp\s+|tbsp\s+|unités?\s+de\s+|unités?\s+|bottes?\s+de\s+|bottes?\s+|tranches?\s+de\s+|morceaux?\s+de\s+|gousses?\s+de\s+|gousses?\s+|pincées?\s+de\s+|pincées?\s+|sachets?\s+de\s+|boîtes?\s+de\s+|verres?\s+de\s+|tasses?\s+de\s+|poignées?\s+de\s+|filets?\s+de\s+)/i,'')
     .replace(/^(quelques?\s+brins?\s+de\s+|quelques?\s+feuilles?\s+de\s+|quelques?\s+feuilles?\s+|quelques?\s+brins?\s+|quelques?\s+|un\s+peu\s+de\s+|une?\s+poignée\s+de\s+|un\s+filet\s+de\s+)/i,'')
     .replace(/^(de |d'|du |des |le |la |les )/i,'')
-    // Strip size/quantity adjectives at start: gros, petit, frais, etc.
-    .replace(/^(gros|grosse?s?|petit|petite?s?|grand|grande?s?|moyen|moyenne?s?|frais|fraîche?s?|vieux|vieille?s?)\s+/i,'')
-    // Strip everything after a comma
+    // Strip size adjectives at start
+    .replace(/^(gros|grosse?s?|petit|petite?s?|grand|grande?s?|moyen|moyenne?s?|frais|fraîche?s?)\s+/i,'')
+    // Strip everything after comma
     .replace(/,.*$/,'')
-    // Strip trailing descriptors
-    .replace(/\s+(égouttés?|rincés?|rincée?s?|effilées?|frais|fraîche?s?|secs?|séchés?|en boîte|surgelés?|râpés?|râpée?s?|moulus?|moulue?s?|entiers?|entière?s?|ou\s+.+|émincés?|éminc[eé]e?s?|hachés?|hachée?s?|coupés?(\s+en\s+\S+)?(\s+\S+)*|coupée?s?(\s+en\s+\S+)?(\s+\S+)*|émietté[es]?|écrasés?|écrasée?s?|pelés?|pelée?s?|mixés?|mixée?s?|grillés?|grillée?s?|cuits?|cuites?|crus?|crues?|rôtis?|rôtie?s?|mariné[es]?|congelés?|surgelé[es]?|en\s+dés?|en\s+lamelles?|en\s+rondelles?(\s+\S+)*|en\s+fines?\s+rondelles?|en\s+julienne|en\s+brunoise|en\s+purée|en\s+poudre|en\s+flocons?|en\s+conserve|bio|nature|salé[es]?|fumés?|fumée?s?|allumettes?|effilochés?|effilochée?s?|finement\s+\S+|grossièrement\s+\S+|fraîchement\s+\S+)$/i,'')
+    // Strip trailing preparation descriptors
+    .replace(/\s+(fraîchement\s+\S+|finement\s+\S+|grossièrement\s+\S+|égouttés?|rincés?|rincée?s?|effilées?|frais|fraîche?s?|secs?|séchés?|en\s+boîte|surgelés?|râpés?|râpée?s?|moulus?|moulue?s?|entiers?|entière?s?|ou\s+.+|émincés?|hachés?|hachée?s?|coupés?(\s+\S+)*|coupée?s?(\s+\S+)*|émietté[es]?|écrasés?|pelés?|pelée?s?|mixés?|grillés?|cuits?|cuites?|crus?|rôtis?|mariné[es]?|en\s+dés?|en\s+lamelles?|en\s+rondelles?(\s+\S+)*|en\s+julienne|en\s+brunoise|en\s+purée|en\s+poudre|en\s+flocons?|en\s+conserve|bio|nature|salé[es]?|fumés?|allumettes?|effilochés?)$/i,'')
     .trim();
   if(!s||s.length<2)return raw.trim();
   return s.charAt(0).toUpperCase()+s.slice(1);
 }
 
 function guessCategory(name){
-  var n=name.toLowerCase();
+  var n=name.toLowerCase()
+    .replace(/œ/g,'oe').replace(/æ/g,'ae')
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'');
   var cats=Object.keys(INGR_CATS);
-  for(var i=0;i<cats.length;i++){var kws=INGR_CATS[cats[i]];for(var j=0;j<kws.length;j++){if(n.indexOf(kws[j])!==-1)return cats[i];}}
-  return 'Épicerie salée';
+  for(var i=0;i<cats.length;i++){
+    var kws=INGR_CATS[cats[i]];
+    for(var j=0;j<kws.length;j++){
+      var kw=kws[j].toLowerCase().replace(/œ/g,'oe').replace(/æ/g,'ae').normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+      if(n.indexOf(kw)!==-1)return cats[i];
+    }
+  }
+  return '\u00c9picerie sal\u00e9e';
 }
+
+var SKIP_INGREDIENTS=/^(eau|sel|poivre|poivre\s+noir|poivre\s+blanc|sel\s+et\s+poivre|poivre\s+et\s+sel|huile\s+d.olive|huile\s+olive)$/i;
 
 function syncIngredientsToProducts(ingr){
   var lines=ingr.split('\n'),added=false;
@@ -946,6 +955,7 @@ function syncIngredientsToProducts(ingr){
     if(!line||/^==.+==$/.test(line))continue;
     var name=cleanIngredientName(line);
     if(!name||name.length<2)continue;
+    if(SKIP_INGREDIENTS.test(name.trim()))continue;
     var exists=PRODUCTS.some(function(p){return p.name.toLowerCase()===name.toLowerCase();});
     if(!exists){var cat=guessCategory(name);PRODUCTS.push({id:'custom_'+Date.now()+'_'+i,name:name,cat:cat,emoji:CAT_EMOJIS[cat]||'🛒',img:''});added=true;}
   }
@@ -1018,14 +1028,32 @@ function initApp(){
   });
 
   // Modal backdrop close
+  // Recipe form dirty check — ask before closing if fields are filled
+  function isRecipeFormDirty(){
+    return ($('r-name')&&$('r-name').value.trim())||($('r-ingr')&&$('r-ingr').value.trim())||($('r-steps')&&$('r-steps').value.trim());
+  }
+  function confirmCloseRecipeModal(id){
+    if(isRecipeFormDirty()){
+      if(!confirm('Tu as des modifications non sauvegardées. Quitter quand même ?'))return;
+    }
+    closeModal(id);
+  }
+
   document.querySelectorAll('.modal-bg').forEach(function(bg){
-    bg.addEventListener('click',function(e){if(e.target===bg)bg.classList.remove('open');});
+    bg.addEventListener('click',function(e){
+      if(e.target!==bg)return;
+      if(bg.id==='modal-add'||bg.id==='modal-import'||bg.id==='modal-pdf-import'){
+        confirmCloseRecipeModal(bg.id);
+      } else {
+        bg.classList.remove('open');
+      }
+    });
   });
 
   // Cancel buttons — explicit IDs, no data-close
   $('btn-cancel-portions').addEventListener('click',function(){closeModal('modal-portions');});
   $('btn-cancel-free-meal').addEventListener('click',function(){closeModal('modal-free-meal');});
-  $('btn-cancel-add').addEventListener('click',function(){closeModal('modal-add');});
+  $('btn-cancel-add').addEventListener('click',function(){confirmCloseRecipeModal('modal-add');});
   $('btn-close-detail').addEventListener('click',function(){closeModal('modal-detail');});
   $('btn-close-item-detail').addEventListener('click',function(){closeModal('modal-item-detail');});
   $('btn-cancel-import').addEventListener('click',function(){closeModal('modal-import');});
@@ -1044,13 +1072,15 @@ function initApp(){
     }catch(e){$(loadingId).classList.remove('show');showMsg(errorId,'Erreur de traduction.');return null;}
   }
 
-  $('btn-translate-import').addEventListener('click',async function(){
+  var btnTrImport=$('btn-translate-import');
+  if(btnTrImport)btnTrImport.addEventListener('click',async function(){
     var fields={name:$('import-name').value,ingredients:$('import-ingr').value,steps:$('import-steps').value,notes:$('import-notes').value};
     var t=await translateRecipeFields(fields,'import-translating','import-error');
     if(t){if(t.name)$('import-name').value=t.name;if(t.ingredients)$('import-ingr').value=formatIngredients(t.ingredients);if(t.steps)$('import-steps').value=formatSteps(t.steps);if(t.notes)$('import-notes').value=t.notes;}
   });
 
-  $('btn-translate-pdf').addEventListener('click',async function(){
+  var btnTrPdf=$('btn-translate-pdf');
+  if(btnTrPdf)btnTrPdf.addEventListener('click',async function(){
     var fields={name:$('pdf-name').value,ingredients:$('pdf-ingr').value,steps:$('pdf-steps').value,notes:$('pdf-notes').value};
     var t=await translateRecipeFields(fields,'pdf-translating','pdf-error');
     if(t){if(t.name)$('pdf-name').value=t.name;if(t.ingredients)$('pdf-ingr').value=formatIngredients(t.ingredients);if(t.steps)$('pdf-steps').value=formatSteps(t.steps);if(t.notes)$('pdf-notes').value=t.notes;}
@@ -1445,6 +1475,7 @@ function generateShopping(navigate){
         var m=line.match(/^([\d.,\/]+\s*(?:cuillères?\s+à\s+soupe|cuillères?\s+à\s+café|c\.?\s*à\s*s\.?|c\.?\s*à\s*c\.?|g|kg|cl|l|ml|cs|cc|tsp|tbsp|unités?|bottes?|tranches?|morceaux?|gousses?|pincées?|sachets?|boîtes?|verres?|tasses?)?\s*)/i);
         var qty=m?m[1].trim():'';
         var nameRaw=cleanIngredientName(line.slice(qty.length).trim()||line);
+        if(SKIP_INGREDIENTS.test(nameRaw.trim()))return;
         // Apply portions multiplier
         if(qty&&portMult!==1){
           var qNum=parseFloat(qty);
